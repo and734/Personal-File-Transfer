@@ -1,0 +1,89 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal File Transfer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Personal File Transfer</h1>
+    <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <p id="progressText">0%</p>
+    <p id="status"></p>
+    <a href="{{ url_for('list_files') }}" class="view-files-button">View Uploaded Files</a>
+</div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        let fileInput = document.getElementById('fileInput');
+        let progressBar = document.getElementById('progressBar');
+        let progressText = document.getElementById('progressText');
+        let status = document.getElementById('status');
+
+        if (fileInput.files.length === 0) {
+            alert("Please select a file.");
+            return;
+        }
+
+        let file = fileInput.files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+
+        // File size validation (client-side)
+        let maxFileSize = 16 * 1024 * 1024; // 16MB
+        if (file.size > maxFileSize) {
+            alert("File size exceeds 16MB!");
+            return;
+        }
+
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload', true);
+
+        // Progress bar update
+        xhr.upload.onprogress = function(event) {
+            if (event.lengthComputable) {
+                let percentComplete = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressText.innerText = percentComplete + '%';
+            }
+        };
+
+        // Handle response
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                status.innerText = "Upload successful!";
+                progressText.innerText = "100%";
+                setTimeout(function() {
+                    progressBar.style.width = '0%';
+                    progressText.innerText = '0%';
+                    status.innerText = '';
+                    fileInput.value = '';
+                }, 3000);
+            } else {
+                status.innerText = "Upload failed with status: " + xhr.status; // Show status code
+            }
+        };
+
+        xhr.onerror = function() {
+            status.innerText = "Network error occurred!";
+        };
+
+        xhr.ontimeout = function() {
+            status.innerText = "Upload timed out!";
+        };
+
+
+        xhr.send(formData);
+    });
+</script>
+</body>
+</html>
