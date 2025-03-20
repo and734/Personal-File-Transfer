@@ -18,6 +18,8 @@ pip install flask
 
 ## Usage
 - Clone this repo
+- create directory static templates uploads
+- app.py server py main directory files.html and index.html in the templates directory styles.css in the static directory
 - Run the following command inside the folder
 ```
 py app.py
