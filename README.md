@@ -28,4 +28,4 @@ py app.py
 **Note:** The port is set to `5000` by default in `server.py`. If you want to change it, modify the last line in `server.py` to any other port you want.
 
 ---
-✌️Sri Hari
+AL
